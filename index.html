@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+
+    <meta charset="utf-8">
+    <title>Ballons </title>
+  </head>
+  <body>
+    <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
+  <script language="javascript" type="text/javascript" src="p5js-temp-sketch_201102a6117907813237690038.js"></script>
+    <script type="text/javascript">
+  let bubbles=[];
+  let answers=[];
+  let q=[];
+  let setQ=true;
+  let timer=70;
+  let answerflag=false;
+  let prev=null;
+  let index=0;
+  let answered=false;
+  let p="Start";
+  let score=0;
+  var b_x=0,b_y=0;
+  function setup() {
+    createCanvas(650, 400);
+    for(let i=0;i<10;i++){
+      let temp=int(random(1,17));
+      answers.push(temp);
+      bubbles.push(new bubble(temp,50+i*60,150));
+      q.push(new question(temp));
+    }
+  }
+
+  function mousePressed(){
+    let mx=mouseX,my=mouseY;
+
+    if(setQ)
+     {
+       if(q.length>0)
+        index=int(random(q.length));
+        else{
+          alert("Score : "+score +"\n Restart ");
+          restart();
+          return;
+        }
+      if(q[index].power===2)
+        p="Square root of " +q[index].question;
+      else
+        p="Cubth root of "+q[index].question;
+       setQ=false;
+       console.log(q[index].ans);
+     }
+    else{
+      for(let i=0;i<bubbles.length;i++){
+        let temp=bubbles[i].clicked(mx,my);
+            if(q[index].ans==temp){
+               bubbles[i].n=-3;
+               answered=true;
+               score++;
+        }
+    }
+      console.log(answered);
+      showNext();
+      if(answered===true){
+        q.splice(index,1);
+        answered=false;
+        setQ=true;
+        console.log("Answered Correctly");
+      }else{
+        console.log("Answered Wrongly");
+        score--;
+      }
+      console.log(q.length);
+    }
+
+  }
+
+  function draw() {
+    c1 = color(135, 206, 255);
+    c2 = color(0,0,50);
+    setGradient(c1, c2);
+    for(let i=0;i<bubbles.length;i++){
+      bubbles[i].show();
+      bubbles[i].move();
+      bubbles[i].Up();
+    }
+     fill(250);
+    if(p!="" && index!=-1)
+      text(p,400,370);
+    else
+      text(p,400,370);
+
+    text("Score: "+score,50,370);
+    showNext();
+    if(frameCount%60==0 && timer> 0 && p!=="Start"){
+      timer--;
+    }
+    noFill();
+    rect(400,30,70*3,10,5);
+    fill(255);
+    rect(400,30,timer*3,10,5);
+    text("Time Left : "+timer,400,20);
+    if(bubbles.length===1 || timer===0){
+        alert("Score : "+score);
+        restart();
+      }
+  }
+  class bubble{
+    constructor(num,x,y){
+      this.x=x;
+      this.y=y;
+      this.n=0;
+      this.offset=int(random(-1.1));
+      this.isClicked=false;
+      this.num=num;
+      this.col=color(200,150);
+    }
+    move(){
+      this.y=this.y+random(-2,2);
+    }
+    Up(){
+      this.y=this.y+this.n;
+    }
+    show(){
+    stroke(0);
+    fill(0);
+    triangle(this.x,this.y+22,this.x+4,this.y+29,this.x-4,this.y+29);
+    fill(this.col);
+    ellipse(this.x,this.y,35,48);
+    line(this.x,this.y+24,this.x,this.y+88);
+    textSize(15);
+    fill(0);
+    text(""+this.num,this.x-3,this.y+2);
+    }
+
+    clicked(mx,my,val){
+      let d=dist(mouseX,mouseY,this.x,this.y);
+      if(d<24){
+        var r=random(0,255);
+        var g=random(0,255);
+        var b=random(0,255);
+        this.col=color(r,g,b,150);
+       return this.num;
+      }
+      return -1;
+    }
+    }
+  class question{
+    constructor(num){
+      this.ans=num;
+      this.power=(num%2)+2;
+      this.question=pow(this.ans,this.power);
+    }
+
+  }
+  function setGradient(c1, c2) {
+    // noprotect
+    noFill();
+    for (var y = 0; y < height; y++) {
+      var inter = map(y, 0, height, 0, 1);
+      var c = lerpColor(c1, c2, inter);
+      stroke(c);
+      line(0, y, width, y);
+    }
+  }
+  function showNext(){
+    //text("Next",200,370);
+  }
+  function restart(){
+    bubbles.splice(0,bubbles.length+1);
+    timer=70;
+    score=0;
+    for(let i=0;i<10;i++){
+      let temp=int(random(1,17));
+      answers.push(temp);
+      bubbles.push(new bubble(temp,50+i*60,150));
+      q.push(new question(temp));
+    }
+  }
+    </script>
+  </body>
+</html>
